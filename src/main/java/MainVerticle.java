@@ -7,6 +7,7 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
 import javafx.util.Pair;
 
 import java.util.HashMap;
@@ -83,14 +84,17 @@ public class MainVerticle extends AbstractVerticle
             Pair<String, String> pair = new Pair<>(nickname, webSocket.binaryHandlerID());
             userMap.put(pair, webSocket);
             System.out.println(nickname + " connect success");
-            String comeInMessage = nickname + "进入了房间";
+            String comeInMessage = "sm"+ nickname + "进入房间";
             broadcast(nickname, comeInMessage);
             webSocket.frameHandler(frame -> {
-                broadcast(nickname, frame.textData());
+                String userMessage = "um"+ nickname + " : " + frame.textData();
+                broadcast(nickname, userMessage);
             });
             webSocket.closeHandler(res -> {
                 System.out.println(nickname + " close connection");
+                String quitMessage = "sm"+ nickname + "离开房间";
                 userMap.remove(pair);
+                broadcast(nickname, quitMessage);
             });
         });
     }
@@ -103,7 +107,7 @@ public class MainVerticle extends AbstractVerticle
             {
                 continue;
             }
-            entry.getValue().writeTextMessage(nickname);
+            entry.getValue().writeTextMessage(message);
         }
     }
 

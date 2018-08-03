@@ -3,7 +3,7 @@
     padding: 0;
 }
 
-ul,li {
+ul, li {
     list-style: none;
 }
 
@@ -15,7 +15,6 @@ textarea {
 body {
     background: url("bg.jpg");
     background-size: 100%;
-    font-size: 17px;
 }
 
 #wrapper {
@@ -32,11 +31,12 @@ body {
     height: 75%;
     padding: 20px;
     box-sizing: border-box;
+    font-size: 0.8em;
 }
 
 #inputWindow {
     float: left;
-    background: palegreen;
+    background: darkseagreen;
     width: 80%;
     height: 25%;
     position: relative;
@@ -46,7 +46,7 @@ body {
 
 #sidebar {
     float: right;
-    background: yellow;
+    background: lightyellow;
     width: 20%;
     height: 100%;
     padding: 20px;
@@ -58,7 +58,7 @@ body {
     height: 100%;
     border: none;
     background: none;
-    font-size: 1em;
+    font-size: 1.2em;
 }
 
 #send {
@@ -75,9 +75,17 @@ body {
 .send {
     text-align: right;
     margin-bottom: 5px;
+    background: aliceblue;
+    padding: 8px;
 }
 
 .receive {
     text-align: left;
     margin-bottom: 5px;
+    background: bisque;
+    padding: 5px;
+}
+
+.sm {
+    color: green;
 }
