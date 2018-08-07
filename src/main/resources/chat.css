@@ -32,6 +32,7 @@ body {
     padding: 20px;
     box-sizing: border-box;
     font-size: 0.8em;
+    overflow-y: scroll;
 }
 
 #inputWindow {
@@ -51,6 +52,7 @@ body {
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
+    position: relative;
 }
 
 #message {
@@ -61,11 +63,15 @@ body {
     font-size: 1.2em;
 }
 
-#send {
+#send,#view{
     padding: 5px;
     position: absolute;
     bottom: 20px;
     right: 20px;
+}
+
+#view{
+    right: 40px;
 }
 
 .hide {

@@ -1,10 +1,11 @@
 let nickname;
 let isLegalName = false;
+const host = "localhost:5927";
 while (!isLegalName) {
     nickname = prompt("请输入昵称");
     if (nickname) {
         $.ajax({
-            url: "http://localhost:5927/checkName",
+            url: "http://" + host + "/checkName",
             data: {nickname},
             async: false,
             success: function (data) {
@@ -20,7 +21,7 @@ while (!isLegalName) {
     }
 }
 $("#wrapper").removeClass("hide");
-let socket = new WebSocket("ws://localhost:5927/" + nickname);
+let socket = new WebSocket("ws://" + host + "/" + nickname);
 
 let $message = $("#message");
 
@@ -55,7 +56,7 @@ socket.onerror = event => {
 
 function getUserList() {
     $.ajax({
-        url: "http://localhost:5927/getUsers",
+        url: "http://" + host + "/getUsers",
         success: function (data) {
             $("#userList").html("");
             for (let i = 0; i < data.length; i++) {
@@ -78,6 +79,13 @@ function sendMessage() {
     $message.val("");
 }
 
+function getAllMessage() {
+    if (socket.readyState != socket.OPEN) {
+        alert("网络连接中断，请刷新页面重试！");
+        return;
+    }
+    window.open("http://localhost:5927/getAllMessage");
+}
 // 日期格式化
 Date.prototype.format = function (format) {
     var o = {

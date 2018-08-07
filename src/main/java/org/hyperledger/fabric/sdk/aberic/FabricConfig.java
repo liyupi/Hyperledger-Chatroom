@@ -35,9 +35,9 @@ public class FabricConfig {
 
     public FabricConfig() {
         // 默认channel-artifacts所在路径 /xxx/WEB-INF/classes/fabric/channel-artifacts/
-        channelArtifactsPath = getChannlePath() + "/channel-artifacts/";
+        channelArtifactsPath = getChannlePath() + "/fabric/channel-artifacts/";
         // 默认crypto-config所在路径 /xxx/WEB-INF/classes/fabric/crypto-config/
-        cryptoConfigPath = getChannlePath() + "/crypto-config/";
+        cryptoConfigPath = getChannlePath() + "/fabric/crypto-config/";
     }
 
     /**
@@ -52,7 +52,7 @@ public class FabricConfig {
         log.debug("directory = " + directory.getPath());
 
         return directory.getPath();
-        // return "src/main/resources/fabric/channel-artifacts/";
+//        return "src/main/resources/fabric";
     }
 
     public Peers getPeers() {
