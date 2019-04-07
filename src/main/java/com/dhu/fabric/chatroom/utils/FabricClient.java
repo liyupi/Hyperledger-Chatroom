@@ -1,11 +1,11 @@
-package org.hyperledger.fabric.sdk.aberic.utils;
+package com.dhu.fabric.chatroom.utils;
 
+import com.dhu.fabric.chatroom.bean.Chaincode;
+import com.dhu.fabric.chatroom.bean.Orderers;
+import com.dhu.fabric.chatroom.bean.Peers;
+import com.dhu.fabric.chatroom.sdk.ChaincodeManager;
+import com.dhu.fabric.chatroom.sdk.FabricConfig;
 import org.apache.log4j.Logger;
-import org.hyperledger.fabric.sdk.aberic.ChaincodeManager;
-import org.hyperledger.fabric.sdk.aberic.FabricConfig;
-import org.hyperledger.fabric.sdk.aberic.bean.Chaincode;
-import org.hyperledger.fabric.sdk.aberic.bean.Orderers;
-import org.hyperledger.fabric.sdk.aberic.bean.Peers;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.TransactionException;
@@ -16,29 +16,35 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Objects;
 
+import static com.dhu.fabric.chatroom.config.FabricClientConfig.*;
 
-public class FabricManager {
+/**
+ * Fabric客户端
+ * 提供操作区块链的功能
+ */
+public class FabricClient {
 
-    private static Logger log = Logger.getLogger(FabricManager.class);
+    private static Logger log = Logger.getLogger(FabricClient.class);
 
     private ChaincodeManager manager;
 
-    private static FabricManager instance = null;
+    private static FabricClient instance = null;
 
-    public static FabricManager obtain()
+    public static FabricClient obtain()
             throws CryptoException, InvalidArgumentException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (null == instance) {
-            synchronized (FabricManager.class) {
+            synchronized (FabricClient.class) {
                 if (null == instance) {
-                    instance = new FabricManager();
+                    instance = new FabricClient();
                 }
             }
         }
         return instance;
     }
 
-    private FabricManager()
+    private FabricClient()
             throws CryptoException, InvalidArgumentException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         manager = new ChaincodeManager(getConfig());
     }
@@ -54,9 +60,6 @@ public class FabricManager {
 
     /**
      * 根据节点作用类型获取节点服务器配置
-     * <p>
-     * //     * @param type
-     * //     *            服务器作用类型（1、执行；2、查询）
      *
      * @return 节点服务器配置
      */
@@ -64,7 +67,7 @@ public class FabricManager {
         FabricConfig config = new FabricConfig();
         config.setOrderers(getOrderers());
         config.setPeers(getPeers());
-        config.setChaincode(getChaincode("mychannel", "mycc", "github.com/hyperledger/fabric/aberic/chaincode/go/chatroom", "1.0"));
+        config.setChaincode(getChaincode(CHANNEL_NAME, CHAINCODE_NAME, CHAINCODE_PATH, CHAINCODE_VERSION));
         config.setChannelArtifactsPath(getChannleArtifactsPath());
         config.setCryptoConfigPath(getCryptoConfigPath());
         return config;
@@ -72,7 +75,7 @@ public class FabricManager {
 
     private Orderers getOrderers() {
         Orderers orderer = new Orderers();
-        orderer.setOrdererDomainName("example.com");
+        orderer.setOrdererDomainName(ORDERER_DOMAIN_NAME);
         orderer.addOrderer("orderer.example.com", "grpc://localhost:7050");
         return orderer;
     }
@@ -106,8 +109,8 @@ public class FabricManager {
         chaincode.setChaincodeName(chaincodeName);
         chaincode.setChaincodePath(chaincodePath);
         chaincode.setChaincodeVersion(chaincodeVersion);
-        chaincode.setInvokeWatiTime(100000);
-        chaincode.setDeployWatiTime(120000);
+        chaincode.setInvokeWaitTime(100000);
+        chaincode.setDeployWaitTime(120000);
         return chaincode;
     }
 
@@ -117,7 +120,7 @@ public class FabricManager {
      * @return /WEB-INF/classes/fabric/channel-artifacts/
      */
     private String getChannleArtifactsPath() {
-        String directorys = FabricManager.class.getClassLoader().getResource("fabric").getFile();
+        String directorys = Objects.requireNonNull(FabricClient.class.getClassLoader().getResource("fabric")).getFile();
         System.out.println(directorys);
 
         log.debug("directorys = " + directorys);
@@ -132,7 +135,7 @@ public class FabricManager {
      * @return /WEB-INF/classes/fabric/crypto-config/
      */
     private String getCryptoConfigPath() {
-        String directorys = FabricManager.class.getClassLoader().getResource("fabric").getFile();
+        String directorys = Objects.requireNonNull(FabricClient.class.getClassLoader().getResource("fabric")).getFile();
         System.out.println(directorys);
 
         log.debug("directorys = " + directorys);

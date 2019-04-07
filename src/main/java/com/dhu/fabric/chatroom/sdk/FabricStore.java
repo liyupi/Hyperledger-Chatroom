@@ -1,4 +1,4 @@
-package org.hyperledger.fabric.sdk.aberic;
+package com.dhu.fabric.chatroom.sdk;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,11 +27,9 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.hyperledger.fabric.sdk.Enrollment;
 
 /**
- * 联盟存储配置对象
+ * 联盟存储配置
  *
- * @author aberic
- * @date 2017年9月7日 - 下午4:36:19
- * @email abericyang@gmail.com
+ * @author LiYupi
  */
 class FabricStore {
 
@@ -56,7 +54,6 @@ class FabricStore {
         try (OutputStream output = new FileOutputStream(file)) {
             properties.setProperty(name, value);
             properties.store(output, "");
-            output.close();
         } catch (IOException e) {
             System.out.println(String.format("Could not save the keyvalue store, reason:%s", e.getMessage()));
         }
@@ -82,7 +79,6 @@ class FabricStore {
         Properties properties = new Properties();
         try (InputStream input = new FileInputStream(file)) {
             properties.load(input);
-            input.close();
         } catch (FileNotFoundException e) {
             System.out.println(String.format("Could not find the file \"%s\"", file));
         } catch (IOException e) {
@@ -99,12 +95,12 @@ class FabricStore {
      * @return 用户
      */
     public FabricUser getMember(String name, String org) {
-        // 尝试从缓存中获取User状�??
+        // 尝试从缓存中获取User信息
         FabricUser fabricUser = members.get(FabricUser.toKeyValStoreName(name, org));
         if (null != fabricUser) {
             return fabricUser;
         }
-        // 创建User，并尝试从键值存储中恢复它的状�??(如果找到的话)�?
+        // 创建User，并尝试从键值存储中恢复它的状态
         fabricUser = new FabricUser(name, org, this);
         return fabricUser;
     }
@@ -115,8 +111,8 @@ class FabricStore {
      * @param name            名称
      * @param org             组织
      * @param mspId           会员id
-     * @param privateKeyFile
-     * @param certificateFile
+     * @param privateKeyFile  私钥文件
+     * @param certificateFile 认证文件
      * @return user 用户
      * @throws IOException
      * @throws NoSuchAlgorithmException
@@ -126,32 +122,20 @@ class FabricStore {
     public FabricUser getMember(String name, String org, String mspId, File privateKeyFile, File certificateFile)
             throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         try {
-            // 尝试从缓存中获取User状�??
+            // 尝试从缓存中获取User信息
             FabricUser fabricUser = members.get(FabricUser.toKeyValStoreName(name, org));
             if (null != fabricUser) {
-                System.out.println("尝试从缓存中获取User状�?? User = " + fabricUser);
+                System.out.println("尝试从缓存中获取User信息 User = " + fabricUser);
                 return fabricUser;
             }
-            // 创建User，并尝试从键值存储中恢复它的状�??(如果找到的话)�?
+            // 创建User，并尝试从键值存储中恢复其信息
             fabricUser = new FabricUser(name, org, this);
             fabricUser.setMspId(mspId);
             String certificate = new String(IOUtils.toByteArray(new FileInputStream(certificateFile)), "UTF-8");
             PrivateKey privateKey = getPrivateKeyFromBytes(IOUtils.toByteArray(new FileInputStream(privateKeyFile)));
             fabricUser.setEnrollment(new StoreEnrollement(privateKey, certificate));
             return fabricUser;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (ClassCastException e) {
+        } catch (IOException | ClassCastException e) {
             e.printStackTrace();
             throw e;
         }
@@ -163,18 +147,14 @@ class FabricStore {
      * @param data 字节数组
      * @return 私钥
      * @throws IOException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
      */
-    private PrivateKey getPrivateKeyFromBytes(byte[] data) throws IOException, NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
+    private PrivateKey getPrivateKeyFromBytes(byte[] data) throws IOException {
         final Reader pemReader = new StringReader(new String(data));
         final PrivateKeyInfo pemPair;
         try (PEMParser pemParser = new PEMParser(pemReader)) {
             pemPair = (PrivateKeyInfo) pemParser.readObject();
         }
-        PrivateKey privateKey = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME).getPrivateKey(pemPair);
-        return privateKey;
+        return new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME).getPrivateKey(pemPair);
     }
 
     static {
@@ -187,8 +167,6 @@ class FabricStore {
 
     /**
      * 自定义注册登记操作类
-     *
-     * @author yangyi47
      */
     static final class StoreEnrollement implements Enrollment, Serializable {
 

@@ -1,4 +1,4 @@
-package org.hyperledger.fabric.sdk.aberic;
+package com.dhu.fabric.chatroom.sdk;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,18 +8,17 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Set;
 
+import lombok.Data;
 import org.bouncycastle.util.encoders.Hex;
+
+import io.netty.util.internal.StringUtil;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
 
-import io.netty.util.internal.StringUtil;
-
 /**
- * 联盟用户对象
+ * 联盟用户
  *
- * @author aberic
- * @date 2017年9月7日 - 下午4:36:53
- * @email abericyang@gmail.com
+ * @author LiYupi
  */
 class FabricUser implements User, Serializable {
 
@@ -46,7 +45,7 @@ class FabricUser implements User, Serializable {
      */
     private String organization;
     /**
-     * 注册操作的密�?
+     * 注册操作的密钥
      */
     private String enrollmentSecret;
     /**
@@ -56,7 +55,7 @@ class FabricUser implements User, Serializable {
     /**
      * 注册登记操作
      */
-    Enrollment enrollment = null; // �?要在测试env中访�?
+    Enrollment enrollment = null;
 
     /**
      * 存储配置对象
@@ -79,7 +78,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 设置账户信息并将用户状�?�更新至存储配置对象
+     * 设置账户信息并将用户状态更新至存储配置对象
      *
      * @param account 账户
      */
@@ -94,7 +93,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 设置从属联盟信息并将用户状�?�更新至存储配置对象
+     * 设置从属联盟信息并将用户状态更新至存储配置对象
      *
      * @param affiliation 从属联盟
      */
@@ -114,7 +113,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 设置会员id信息并将用户状�?�更新至存储配置对象
+     * 设置会员id信息并将用户状态更新至存储配置对象
      *
      * @param mspID 会员id
      */
@@ -134,7 +133,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 设置规则信息并将用户状�?�更新至存储配置对象
+     * 设置规则信息并将用户状态更新至存储配置对象
      *
      * @param roles 规则
      */
@@ -155,7 +154,7 @@ class FabricUser implements User, Serializable {
     /**
      * 设置注册操作的密钥信息并将用户状态更新至存储配置对象
      *
-     * @param enrollmentSecret 注册操作的密�?
+     * @param enrollmentSecret 注册操作的密钥
      */
     public void setEnrollmentSecret(String enrollmentSecret) {
         this.enrollmentSecret = enrollmentSecret;
@@ -163,7 +162,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 设置注册登记操作信息并将用户状�?�更新至存储配置对象
+     * 设置注册登记操作信息并将用户状态更新至存储配置对象
      *
      * @param enrollment 注册登记操作
      */
@@ -173,9 +172,7 @@ class FabricUser implements User, Serializable {
     }
 
     /**
-     * 确定这个名称是否已注�?
-     *
-     * @return 与否
+     * 确定名称是否已注册
      */
     public boolean isRegistered() {
         return !StringUtil.isNullOrEmpty(enrollmentSecret);

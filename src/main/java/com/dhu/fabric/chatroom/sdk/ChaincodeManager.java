@@ -1,12 +1,10 @@
-package org.hyperledger.fabric.sdk.aberic;
+package com.dhu.fabric.chatroom.sdk;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.dhu.fabric.chatroom.bean.Chaincode;
+import com.dhu.fabric.chatroom.bean.Orderers;
+import com.dhu.fabric.chatroom.bean.Peers;
 import org.apache.log4j.Logger;
 import org.hyperledger.fabric.sdk.*;
-import org.hyperledger.fabric.sdk.aberic.bean.Chaincode;
-import org.hyperledger.fabric.sdk.aberic.bean.Orderers;
-import org.hyperledger.fabric.sdk.aberic.bean.Peers;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
@@ -26,6 +24,12 @@ import java.util.concurrent.TimeoutException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * 链码管理类
+ * 封装了调用（invoke）、查询（query）等功能
+ *
+ * @author LiYupi
+ */
 public class ChaincodeManager {
 
     private static Logger log = Logger.getLogger(ChaincodeManager.class);
@@ -57,36 +61,30 @@ public class ChaincodeManager {
         fabricOrg = getFabricOrg();
         channel = getChannel();
         chaincodeID = getChaincodeID();
-
-        client.setUserContext(fabricOrg.getPeerAdmin()); // 也许是1.0.0测试版的bug，只有节点管理员可以调用链码
+        // 以节点管理员身份调用链码
+        client.setUserContext(fabricOrg.getPeerAdmin());
     }
 
     private FabricOrg getFabricOrg() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException {
-
         // java.io.tmpdir : C:\Users\{user}\AppData\Local\Temp\
         File storeFile = new File(System.getProperty("java.io.tmpdir") + "/HFCSampletest.properties");
         FabricStore fabricStore = new FabricStore(storeFile);
-
-        // Get Org1 from configuration
+        // 从配置文件中读取机构信息
         FabricOrg fabricOrg = new FabricOrg(peers, orderers, fabricStore, config.getCryptoConfigPath());
         log.debug("Get FabricOrg");
         return fabricOrg;
     }
 
     private Channel getChannel()
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
+            throws InvalidArgumentException, TransactionException {
         client.setUserContext(fabricOrg.getPeerAdmin());
         return getChannel(fabricOrg, client);
     }
 
     private Channel getChannel(FabricOrg fabricOrg, HFClient client)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
+            throws InvalidArgumentException, TransactionException {
         Channel channel = client.newChannel(chaincode.getChannelName());
         log.debug("Get Chain " + chaincode.getChannelName());
-
-//        channel.setsetTransactionWaitTime(chaincode.getInvokeWatiTime());
-//        channel.setDeployWaitTime(chaincode.getDeployWatiTime());
-
         for (int i = 0; i < peers.get().size(); i++) {
             File peerCert = Paths.get(config.getCryptoConfigPath(), "/peerOrganizations", peers.getOrgDomainName(), "peers", peers.get().get(i).getPeerName(), "tls/server.crt")
                     .toFile();
@@ -132,32 +130,6 @@ public class ChaincodeManager {
         if (!channel.isInitialized()) {
             channel.initialize();
         }
-        /*if (config.isRegisterEvent()) {
-            channel.registerBlockListener(new BlockListener() {
-
-                @Override
-                public void received(BlockEvent event) {
-                    // TODO
-                    log.debug("========================Event事件监听开始========================");
-                    try {
-                        log.debug("event.getChannelId() = " + event.getChannelId());
-                        log.debug("event.getEvent().getChaincodeEvent().getPayload().toStringUtf8() = " + event.getEvent().getChaincodeEvent().getPayload().toStringUtf8());
-                        log.debug("event.getBlock().getData().getDataList().size() = " + event.getBlock().getData().getDataList().size());
-                        ByteString byteString = event.getBlock().getData().getData(0);
-                        String result = byteString.toStringUtf8();
-                        log.debug("byteString.toStringUtf8() = " + result);
-
-                        String r1[] = result.split("END CERTIFICATE");
-                        String rr = r1[2];
-                        log.debug("rr = " + rr);
-                    } catch (InvalidProtocolBufferException e) {
-                        // TODO
-                        e.printStackTrace();
-                    }
-                    log.debug("========================Event事件监听结束========================");
-                }
-            });
-        }*/
         return channel;
     }
 
@@ -166,25 +138,13 @@ public class ChaincodeManager {
     }
 
     /**
-     * 执行智能合约
+     * 调用链码
      *
      * @param fcn  方法名
      * @param args 参数数组
-     * @return
-     * @throws InvalidArgumentException
-     * @throws ProposalException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws IOException
-     * @throws TransactionException
-     * @throws CryptoException
-     * @throws InvalidKeySpecException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
      */
     public Map<String, String> invoke(String fcn, String[] args)
-            throws InvalidArgumentException, ProposalException, InterruptedException, ExecutionException, TimeoutException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, CryptoException, TransactionException, IOException {
+            throws InvalidArgumentException, ProposalException, IOException {
         Map<String, String> resultMap = new HashMap<>();
 
         Collection<ProposalResponse> successful = new LinkedList<>();
@@ -237,36 +197,17 @@ public class ChaincodeManager {
             resultMap.put("data", resultAsString);
             return resultMap;
         }
-
-        /*channel.sendTransaction(successful).thenApply(transactionEvent -> {
-            if (transactionEvent.isValid()) {
-                log.info("Successfully send transaction proposal to orderer. Transaction ID: " + transactionEvent.getTransactionID());
-            } else {
-                log.info("Failed to send transaction proposal to orderer");
-            }
-            // chain.shutdown(true);
-            return transactionEvent.getTransactionID();
-        }).get(chaincode.getInvokeWatiTime(), TimeUnit.SECONDS);*/
     }
 
     /**
-     * 查询智能合约
+     * 查询链上数据
      *
      * @param fcn  方法名
      * @param args 参数数组
-     * @return
-     * @throws InvalidArgumentException
-     * @throws ProposalException
-     * @throws IOException
-     * @throws TransactionException
-     * @throws CryptoException
-     * @throws InvalidKeySpecException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
      */
     public Map<String, String> query(String fcn, String[] args) throws InvalidArgumentException, ProposalException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, CryptoException, TransactionException, IOException {
         Map<String, String> resultMap = new HashMap<>();
-        String payload = "";
+        String payload;
         QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
         queryByChaincodeRequest.setArgs(args);
         queryByChaincodeRequest.setFcn(fcn);

@@ -1,7 +1,6 @@
-package aberic;
+package com.dhu.fabric.chatroom.utils;
 
-import org.hyperledger.fabric.sdk.aberic.ChaincodeManager;
-import org.hyperledger.fabric.sdk.aberic.utils.FabricManager;
+import com.dhu.fabric.chatroom.sdk.ChaincodeManager;
 import org.junit.Test;
 
 import java.util.Map;
@@ -10,10 +9,10 @@ import java.util.Map;
  * @Author: Yupi Li
  * @Date: 2018/8/5 22:09
  */
-public class FabricManagerTest {
+public class FabricClientTest {
     @Test
     public void test1() throws Exception{
-        ChaincodeManager manager = FabricManager.obtain().getManager();
+        ChaincodeManager manager = FabricClient.obtain().getManager();
         String fcn = "saveMessage" ;
         String[] arguments = new String[]{"aaa","hahahaha"};
         manager.invoke(fcn, arguments);

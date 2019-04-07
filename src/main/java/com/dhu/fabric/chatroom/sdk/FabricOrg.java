@@ -1,4 +1,12 @@
-package org.hyperledger.fabric.sdk.aberic;
+package com.dhu.fabric.chatroom.sdk;
+
+import com.dhu.fabric.chatroom.bean.Orderers;
+import com.dhu.fabric.chatroom.bean.Peers;
+import lombok.Data;
+import org.apache.log4j.Logger;
+import org.hyperledger.fabric.sdk.Peer;
+import org.hyperledger.fabric.sdk.User;
+import org.hyperledger.fabric_ca.sdk.HFCAClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,31 +14,15 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.hyperledger.fabric.sdk.Peer;
-import org.hyperledger.fabric.sdk.User;
-import org.hyperledger.fabric.sdk.aberic.bean.Orderers;
-import org.hyperledger.fabric.sdk.aberic.bean.Peers;
-import org.hyperledger.fabric_ca.sdk.HFCAClient;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.cn;
+import java.util.*;
 
 
 /**
- * 联盟组织对象
+ * 联盟链机构
  *
- * @author aberic
- * @date 2017年9月7日 - 下午4:35:40
- * @email abericyang@gmail.com
+ * @author LiYupi
  */
+@Data
 class FabricOrg {
 
     private static Logger log = Logger.getLogger(FabricOrg.class);
@@ -51,23 +43,23 @@ class FabricOrg {
     /**
      * 用户集合
      */
-    Map<String, User> userMap = new HashMap<>();
+    private Map<String, User> userMap = new HashMap<>();
     /**
      * 本地节点集合
      */
-    Map<String, String> peerLocations = new HashMap<>();
+    private Map<String, String> peerLocations = new HashMap<>();
     /**
      * 本地排序服务集合
      */
-    Map<String, String> ordererLocations = new HashMap<>();
+    private Map<String, String> ordererLocations = new HashMap<>();
     /**
      * 本地事件集合
      */
-    Map<String, String> eventHubLocations = new HashMap<>();
+    private Map<String, String> eventHubLocations = new HashMap<>();
     /**
      * 节点集合
      */
-    Set<Peer> peers = new HashSet<>();
+    private Set<Peer> peers = new HashSet<>();
     /**
      * 联盟管理员用户
      */
@@ -98,7 +90,7 @@ class FabricOrg {
         for (int i = 0; i < peers.get().size(); i++) {
             addPeerLocation(peers.get().get(i).getPeerName(), peers.get().get(i).getPeerLocation());
             addEventHubLocation(peers.get().get(i).getPeerEventHubName(), peers.get().get(i).getPeerEventHubLocation());
-            setCALocation(peers.get().get(i).getCaLocation());
+            setCaLocation(peers.get().get(i).getCaLocation());
         }
         for (int i = 0; i < orderers.get().size(); i++) {
             addOrdererLocation(orderers.get().get(i).getOrdererName(), orderers.get().get(i).getOrdererLocation());
@@ -116,55 +108,6 @@ class FabricOrg {
         log.debug("skFile = " + skFile.getAbsolutePath());
         log.debug("certificateFile = " + certificateFile.getAbsolutePath());
         setPeerAdmin(fabricStore.getMember(peers.getOrgName() + "Admin", peers.getOrgName(), peers.getOrgMSPID(), findFileSk(skFile), certificateFile)); // 一个特殊的用户，可以创建通道，连接对等点，并安装链码
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 获取联盟管理员用户
-     *
-     * @return 联盟管理员用户
-     */
-    public FabricUser getAdmin() {
-        return admin;
-    }
-
-    /**
-     * 设置联盟管理员用户
-     *
-     * @param admin 联盟管理员用户
-     */
-    public void setAdmin(FabricUser admin) {
-        this.admin = admin;
-    }
-
-    /**
-     * 获取会员id
-     *
-     * @return 会员id
-     */
-    public String getMSPID() {
-        return mspid;
-    }
-
-    /**
-     * 设置本地ca
-     *
-     * @param caLocation 本地ca
-     */
-    public void setCALocation(String caLocation) {
-        this.caLocation = caLocation;
-    }
-
-    /**
-     * 获取本地ca
-     *
-     * @return 本地ca
-     */
-    public String getCALocation() {
-        return this.caLocation;
     }
 
     /**
@@ -282,24 +225,6 @@ class FabricOrg {
     }
 
     /**
-     * 设置 ca 客户端
-     *
-     * @param caClient ca 客户端
-     */
-    public void setCAClient(HFCAClient caClient) {
-        this.caClient = caClient;
-    }
-
-    /**
-     * 获取 ca 客户端
-     *
-     * @return ca 客户端
-     */
-    public HFCAClient getCAClient() {
-        return caClient;
-    }
-
-    /**
      * 向用户集合中添加用户
      *
      * @param user 用户
@@ -327,59 +252,6 @@ class FabricOrg {
         peers.add(peer);
     }
 
-    /**
-     * 设置 ca 配置
-     *
-     * @param caProperties ca 配置
-     */
-    public void setCAProperties(Properties caProperties) {
-        this.caProperties = caProperties;
-    }
-
-    /**
-     * 获取 ca 配置
-     *
-     * @return ca 配置
-     */
-    public Properties getCAProperties() {
-        return caProperties;
-    }
-
-    /**
-     * 设置联盟单节点管理员用户
-     *
-     * @param peerAdmin 联盟单节点管理员用户
-     */
-    public void setPeerAdmin(FabricUser peerAdmin) {
-        this.peerAdmin = peerAdmin;
-    }
-
-    /**
-     * 获取联盟单节点管理员用户
-     *
-     * @return 联盟单节点管理员用户
-     */
-    public FabricUser getPeerAdmin() {
-        return peerAdmin;
-    }
-
-    /**
-     * 设置域名名称
-     *
-     * @param domainName 域名名称
-     */
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    /**
-     * 获取域名名称
-     *
-     * @return 域名名称
-     */
-    public String getDomainName() {
-        return domainName;
-    }
 
     /**
      * 从指定路径中获取后缀为 _sk 的文件，且该路径下有且仅有该文件
