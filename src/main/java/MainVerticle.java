@@ -1,3 +1,5 @@
+import com.dhu.fabric.chatroom.sdk.ChaincodeManager;
+import com.dhu.fabric.chatroom.utils.FabricClient;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -7,8 +9,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import javafx.util.Pair;
-import com.dhu.fabric.chatroom.sdk.ChaincodeManager;
-import com.dhu.fabric.chatroom.utils.FabricClient;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -19,7 +19,9 @@ import java.util.*;
  * @author LiYupi
  */
 public class MainVerticle extends AbstractVerticle {
-    // 用户存储，<用户名, socketId>
+    /**
+     * 用户存储，<用户名, socketId>
+     */
     private Map<Pair<String, String>, ServerWebSocket> userMap = new HashMap<>();
 
     private ChaincodeManager chaincodeManager;
